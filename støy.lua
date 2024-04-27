@@ -325,6 +325,7 @@ g.key = function(x,y,z)
   
   if z == 1 and held1 == false then
     p_pos = y
+    g_pos = y
     word = p_list[p_pos]
     remember = word
     if x/16 == 0.0625 then
