@@ -63,6 +63,7 @@ function init()
 	p_list = {'hard', 'soft', 'drift', 'cut', 'res', 'fm', 'am', 'gain'}
 	p_zero = 0
 	p_pos = 1
+	g_pos = 1
 	p_val = params:get_raw('hard')
 	g_val = params:get_raw('hard')
 	
@@ -313,7 +314,7 @@ function redraw_grid()
   g:all(0)
   scanlines_grid(br_lines)
   rows()
-  row(p_pos, br_row)
+  row(g_pos, br_row)
   g:refresh()
 end
 
@@ -334,7 +335,7 @@ g.key = function(x,y,z)
       gridval = x/16
     end
     params:set_raw(word, gridval)
-    p_val = params:get_raw(word)
+    g_val = params:get_raw(word)
   elseif z == 1 and held1 == true then
     
   end
