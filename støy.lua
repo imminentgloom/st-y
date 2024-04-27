@@ -64,6 +64,7 @@ function init()
 	p_zero = 0
 	p_pos = 1
 	p_val = params:get_raw('hard')
+	g_val = params:get_raw('hard')
 	
 	 -- define starting sound
 
@@ -222,6 +223,7 @@ function enc(n,d)
     word = p_list[p_pos]
     remember = word
     p_val = params:get_raw(p_list[p_pos])
+    g_val = params:get_raw(p_list[p_pos])
   elseif n == 2 and held1 == true then
     params:delta('delay_rate', d)
     word = 'rate'
@@ -233,6 +235,7 @@ function enc(n,d)
     word = p_list[p_pos]
     remember = word
     p_val = params:get_raw(p_list[p_pos])
+    g_val = params:get_raw(p_list[p_pos])
   elseif n == 3 and held1 == true then
     params:delta('delay_feedback',d)
     word = 'fb'
@@ -284,7 +287,7 @@ function row(row, str)
   for n = 1, 16 do
     g:led(n, row, br_row_bg)
   end
-  for n = 1, math.floor(p_val * 16, 1) do
+  for n = 1, math.floor(g_val * 16, 1) do
     g:led(n, row, str)
   end
 end
