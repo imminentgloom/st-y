@@ -314,7 +314,7 @@ function redraw_grid()
   g:all(0)
   scanlines_grid(br_lines)
   rows()
-  row(g_pos, br_row)
+  row(p_pos, br_row)
   g:refresh()
 end
 
