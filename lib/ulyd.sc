@@ -13,7 +13,7 @@ Engine_ulyd : CroneEngine {
 
 		synth = {
 
-			arg	out, hz, hard, soft, drift, cut, res, fm, gain, am, mute;
+			arg	out, hz, hard, soft, drift, cut, res, fm, gain, am, level;
 
 			var fb, osc1, osc2, osc3, mix, filter, amp;
 
@@ -29,7 +29,7 @@ Engine_ulyd : CroneEngine {
 			filter = MoogFF.ar(in: osc1, freq: fm * (osc2 * cut) + cut, gain: res);
 			amp = ((filter * gain) + (am * osc3)).tanh;
 
-			Out.ar(out, Pan2.ar(amp*0.125)*mute);
+			Out.ar(out, Pan2.ar(amp*0.125)*level);
 
 		}.play(args: [\out, context.out_b], target: context.xg);
 
@@ -71,8 +71,8 @@ Engine_ulyd : CroneEngine {
 			synth.set(\gain, msg[1]);
 		});
 		
-		this.addCommand("mute", "f", { arg msg;
-			synth.set(\mute, msg[1]);
+		this.addCommand("level", "f", { arg msg;
+			synth.set(\level, msg[1]);
 		});
 
 	}
