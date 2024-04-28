@@ -382,7 +382,7 @@ function enc(n, d)
 end
 
 
--- grid (x possiton, y possition - think of it as row, z goes high if pressed)
+-- grid (x possiton, y possition - think of it as row, z is high if pressed)
 
 g.key = function(x, y, z)
 	if z == 1 and k1_held == false then
