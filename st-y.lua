@@ -155,8 +155,8 @@ end
 
 -- additional audio things
 
-function mute(x)
-  params:set('mute', x)
+function level(x)
+  params:set('level', x)
 end
 
 function send(x)
