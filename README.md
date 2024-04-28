@@ -2,7 +2,7 @@
 
 ![støy](screenshot.png)
 
-støy is noise
+støy (/stœj/) is noise
 
 i made this to play scratchy, screeching, sputtering noises, you can play too
 
