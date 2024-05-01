@@ -12,6 +12,7 @@
 -- e2 choose
 -- e3 affect
 --
+-- k1+e1 hz, fine
 -- k1+e2 delay rate
 -- k1+e3 feedback
 -- k2 delay send
