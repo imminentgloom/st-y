@@ -400,6 +400,7 @@ end
 
 g.key = function(x, y, state)
 	if state == 1 and k1_held == false then
+		p_pos_zero = y - 1
 		p_pos = y												                          -- press any button in a row to select a word
 		word = p_list[p_pos]
 		remember = word
