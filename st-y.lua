@@ -301,7 +301,7 @@ function key(n,z)
 	elseif n == 1 and z == 0 then
 		k1_held = false
 		word = remember
-		p_val = params:get_raw(p_list[p_pos])
+		p_val = params:get_raw(word)
 	end
 
 	-- send audio to delay if k2 is held
@@ -315,7 +315,7 @@ function key(n,z)
 		k2_held = false
 		send(0.0)
 		word = remember
-		p_val = params:get_raw(p_list[p_pos])
+		p_val = params:get_raw(word)
 	end	
 
 	-- mute audio (but not delay) if k3 is held
@@ -329,7 +329,7 @@ function key(n,z)
 		k3_held = false
 		level(1.0)
 		word = remember
-		p_val = params:get_raw(p_list[p_pos])
+		p_val = params:get_raw(word)
 	end
 	
 	-- a word for when k2 and k3 are held simultaneously
@@ -367,7 +367,7 @@ function enc(n, d)
 		p_pos = p_pos_zero + 1	    	-- index list starting at 1
 		word = p_list[p_pos]
 		remember = word
-		p_val = params:get_raw(p_list[p_pos])
+		p_val = params:get_raw(word)
 		g_val = p_val 					-- hold a subset of possible p_val-s that the grid understands ie. words from the list
 	elseif n == 2 and k1_held == true then
 		params:delta('delay_rate', d)
@@ -381,7 +381,7 @@ function enc(n, d)
 	  params:delta(p_list[p_pos], d)
 		word = p_list[p_pos]
 		remember = word
-		p_val = params:get_raw(p_list[p_pos])
+		p_val = params:get_raw(word)
 		g_val = p_val
 	elseif n == 3 and k1_held == true then
 		params:delta('delay_feedback', d)
