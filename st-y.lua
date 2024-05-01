@@ -354,7 +354,7 @@ function enc(n, d)
 	
 	-- e1 sets frequency, fine tune if k1 is held, it has no other function
 	
-	if n == 1 then
+	if n == 1 and k1_held == false then
 		params:delta('hz', d)
 		word = 'hz'
 		remember = word
