@@ -351,12 +351,16 @@ function enc(n, d)
 	-- there is a basic pattern
 	-- something moves, a thing changes, a word is called and its meaning uttered
 	
-	-- e1 sets frequency, it has no other function
+	-- e1 sets frequency, fine tune if k1 is held, it has no other function
 	
 	if n == 1 then
 		params:delta('hz', d)
 		word = 'hz'
 		remember = word
+		p_val = params:get_raw('hz')
+	elseif n == 1 and k1_held == true then
+		params:delta('hz', d * 0.1)
+		word = 'hz.0'
 		p_val = params:get_raw('hz')
 	end
 
