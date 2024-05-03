@@ -179,7 +179,7 @@ function init()
 	-- load last parms if we choose to persist
   
  	if persistence == true then
-   		params:read(99)
+   		params:read('/home/we/dust/data/støy/state.pset')
     	params:bang()
   	end
 
@@ -446,7 +446,7 @@ function cleanup()
 	-- if we choose to persist save params
 
 	if persistence == true then
-		params:write(99)
+		params:write('/home/we/dust/data/støy/state.pset')
 	end
 
 end
