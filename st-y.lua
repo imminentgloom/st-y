@@ -33,6 +33,11 @@ g = grid.connect()
 
 function init()
 	
+	-- do we persist?
+	
+	persistence = false -- start with default sound when false, start where you left off if true
+	
+	
 	-- first screen, first word 
 	-- big text, use small words
 	
@@ -164,6 +169,14 @@ function init()
 	p_val = params:get_raw('hard')
 	g_val = params:get_raw('hard')
 
+
+
+	-- load last parms if we choose to persist
+  
+ 	if persistence == true then
+   		params:read(99)
+    	params:bang()
+  	end
 
   -- when something moves, everything changes
 	
@@ -424,5 +437,11 @@ end
 -- if there is a mess to clean up
 
 function cleanup()
+
+	-- if we choose to persist save params
+
+	if persistence == true then
+		params:write(99)
+	end
 
 end
