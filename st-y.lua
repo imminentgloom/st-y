@@ -158,6 +158,11 @@ function init()
 			
 	params:add_control('delay_pan', 'delay pan', controlspec.new(-1, 1.0, 'lin', 0, 0, ''))
 	params:set_action('delay_pan', function(x) softcut.pan(1, x) end)
+		
+	params:add_control('delay_send', 'delay send', controlspec.new(0, 1, 'lin', 0, 0, ''))
+	params:set_action('delay_send', function(x) audio.level_eng_cut(x) end)
+	
+	
 	
 	-- make a list of params to use with interface
 	
@@ -290,7 +295,7 @@ end
 -- turn up send to feed the delay
 
 function send(x)
-	audio.level_eng_cut(x)
+	params:set('delay_send', x)
 end
 
 
