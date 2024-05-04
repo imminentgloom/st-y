@@ -2,7 +2,7 @@
 
 ![støy](screenshot.png)
 
-støy (/stœj/) is noise
+(/stœj/) is noise
 
 skittering, scratching, sputtering sounds from a trio of oscillators that respectively feed, fm and am a filter, there is feedback and a delay if you want. a button makes it all (except the delay) stop.
 
