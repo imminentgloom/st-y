@@ -36,4 +36,3 @@ set persistence = true on line 41 to start where you left off, defaults to false
 
 
 install from maiden or download to ‘dust/code’, then restart norns
-
