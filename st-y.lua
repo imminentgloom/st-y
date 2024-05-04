@@ -6,7 +6,7 @@
 --
 --
 -- ...
--- v1.0 / imminentgloom 
+-- v1.1 / imminentgloom 
 --
 -- e1 hz
 -- e2 choose
@@ -21,6 +21,7 @@
 -- 16 snapshots 
 -- k1+row1 save
 -- k1+row2-8 load
+
 
 -- load engine
 

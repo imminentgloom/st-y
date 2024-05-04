@@ -27,6 +27,12 @@ k1+e3 delay feedback
 k2 momentary delay send
 k3 momentary mute
 
+16 snapshots
+k1+row1 save
+k2+row2-8 load
+
+set persistence = true on line 41 to start where you left off, defaults to false/default sound
+
 
 
 install from maiden or download to ‘dust/code’, then restart norns
