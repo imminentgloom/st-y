@@ -17,7 +17,10 @@
 -- k1+e3 feedback
 -- k2 delay send
 -- k3 mute
-
+--
+-- 16 snapshots 
+-- k1+row1 save
+-- k1+row2-8 load
 
 -- load engine
 
@@ -35,14 +38,14 @@ function init()
 	
 	-- do we persist?
 	
-	persistence = false -- start with default sound when false, start where you left off if true
+	persistence = false  -- start with default sound when false, start where you left off if true
 	
 	
 	-- first screen, first word 
 	-- big text, use small words
 	
-	word = 'støy' -- words command change
-	remember = 'hard' -- sometimes we use word that have less meaning - remember the real word
+	word = 'støy'		-- words command change
+	remember = 'hard'	-- sometimes we use word that have less meaning - remember the real word
 	
 	screen.aa(0)
 	screen.blend_mode(4)
@@ -52,10 +55,10 @@ function init()
 	
 	-- grid: brightness levels (0-15)
 	
-	g_scanlines = 2	  -- scanlines
+	g_scanlines = 2		-- scanlines
 	g_current = 12		-- current row, active segment
 	g_background = 6	-- current row, background
-	g_params = 3			-- all rows, current draws on top
+	g_params = 3		-- all rows, current draws on top
 	
 	
 	-- start with no keys held
@@ -155,13 +158,9 @@ function init()
 	
 	params:add_control('delay_feedback', 'delay feedback', controlspec.new(0, 1.0, 'lin', 0, 0.75, ''))
 	params:set_action('delay_feedback', function(x) softcut.pre_level(1, x) end)
-			
-	params:add_control('delay_pan', 'delay pan', controlspec.new(-1, 1.0, 'lin', 0, 0, ''))
-	params:set_action('delay_pan', function(x) softcut.pan(1, x) end)
-		
+
 	params:add_control('delay_send', 'delay send', controlspec.new(0, 1, 'lin', 0, 0, ''))
 	params:set_action('delay_send', function(x) audio.level_eng_cut(x) end)
-	
 	
 	
 	-- make a list of params to use with interface
@@ -175,18 +174,19 @@ function init()
 	g_val = params:get_raw('hard')
 
 
-
 	-- load last parms if we choose to persist
   
- 	if persistence == true then
-   		params:read('/home/we/dust/data/støy/state.pset')
-    	params:bang()
+  	if persistence == true then
+  		params:read('/home/we/dust/data/støy/state.pset')
+  		params:bang()
   	end
 
-  -- when something moves, everything changes
+
+  	-- when something moves, everything changes
 	
-  redraw_all()
+  	redraw_all()
 end
+
 
 -- drawing functions: interface
 
@@ -199,6 +199,7 @@ function bargraph()
 	screen.fill()
 end
 
+
 -- draw noisy lines across the screen
 
 function scanlines()
@@ -210,6 +211,7 @@ function scanlines()
 	end
 end
 
+
 -- write a word on the screen
 
 function scribe()
@@ -217,6 +219,7 @@ function scribe()
 	screen.move(3, 48)
 	screen.text(word)
 end
+
 
 -- draw the above on the screen
 
@@ -244,6 +247,7 @@ function row_current(row)
 	end
 end
 
+
 -- dimly light up all rows with values rounded to nearest 16th (no background)
 
 function row_all()
@@ -253,6 +257,7 @@ function row_all()
 		end
 	end
 end
+
 
 -- draw noisy lines across the grid
 
@@ -264,6 +269,7 @@ function scanlines_grid()
 		end
 	end
 end
+
 
 -- draw the above on the grid
 
@@ -291,6 +297,7 @@ end
 function level(x)
 	params:set('level', x)
 end
+
 
 -- turn up send to feed the delay
 
@@ -323,6 +330,7 @@ function key(n,z)
 		p_val = params:get_raw(word)
 	end
 
+
 	-- send audio to delay if k2 is held
 	
 	if n == 2 and z == 1 then
@@ -337,6 +345,7 @@ function key(n,z)
 		p_val = params:get_raw(word)
 	end	
 
+
 	-- mute audio (but not delay) if k3 is held
 
 	if n == 3 and z == 1 then
@@ -350,12 +359,14 @@ function key(n,z)
 		word = remember
 		p_val = params:get_raw(word)
 	end
-	
+
+
 	-- a word for when k2 and k3 are held simultaneously
 	
 	if k2_held == true and k3_held == true then
 		word = 'dull'
 	end
+	
 	
 	-- when something moves, everything changes
 	
@@ -383,6 +394,7 @@ function enc(n, d)
 		p_val = params:get_raw('hz')
 	end
 
+
 	-- e2 sets the parameter changed by e3 (alt: sets delay rate)
 	
 	if n == 2 and k1_held == false then
@@ -397,6 +409,7 @@ function enc(n, d)
 		word = 'rate'
 		p_val = params:get_raw('delay_rate')
 	end
+	
 	
 	-- e3 changes the paramter set by e2 (alt: sets delay feedback)
 	
@@ -419,18 +432,26 @@ function enc(n, d)
 end
 
 
--- grid (x possiton, y possition - think of it as row, z is high if pressed)
+-- grid (x possiton, y possition, state)
 
-g.key = function(x, y, state)
-	if state == 1 and k1_held == false then
-		p_pos_zero = y - 1
-		p_pos = y												                          -- press any button in a row to select a word
-		word = p_list[p_pos]
-		remember = word
-		if x / 16 == 0.0625 then g_val = 0 else g_val = x / 16 end	-- x possition sets the value, plays better if first button is 0
-		params:set_raw(word, g_val)
-		p_val = params:get_raw(word)
-	end
+g.key = function(x, y, z)
+	if z == 1 then                                                			-- only act when keys are pressed
+		if k1_held == false then
+			p_pos_zero = y - 1
+			p_pos = y												    	-- press any button in a row to select a word
+			word = p_list[p_pos]
+			remember = word
+			if x / 16 == 0.0625 then g_val = 0 else g_val = x / 16 end		-- x possition sets the value, plays better if first button is 0
+			params:set_raw(word, g_val)
+			p_val = params:get_raw(word)
+		elseif k1_held == true and y == 1 then                       		-- k1 + any button from row 1: save a snapshot
+      		params:write('/home/we/dust/data/støy/snapshot_'.. x ..'.pset')
+      		word = x .. '.'
+    	elseif k1_held == true and y ~= 1 then                       		-- k1 + any button form any other row: load a snapshot
+      		params:read('/home/we/dust/data/støy/snapshot_'.. x ..'.pset')
+	    	word = x .. '!'
+	  	end
+  end
 
 
 	-- when something moves, everything changes
@@ -448,5 +469,4 @@ function cleanup()
 	if persistence == true then
 		params:write('/home/we/dust/data/støy/state.pset')
 	end
-
 end
