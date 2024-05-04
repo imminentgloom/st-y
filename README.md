@@ -1,6 +1,6 @@
 # støy
 
-![støy](screenshot.png)
+![støy](screenshot.png)?
 
 støy (/stœj/) is noise
 
