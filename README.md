@@ -8,10 +8,12 @@ skittering, scratching, sputtering sounds from a trio of oscillators that respec
 
 i made this to see if i could play the same kind of music on norns as i have done for years on my modular, they both feel similar, familiar, but also different.
 
-if you want you can play too
-
-
-
+if you want you can play too  
+<br>
+<br>
+v2.0 - drops state-saving, adds resonant equalizer
+<br>  
+<br>
 requires norns, grid optional
 
 
