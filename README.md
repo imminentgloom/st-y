@@ -10,6 +10,7 @@ i made this to see if i could play the same kind of music on norns as i have don
 
 if you want you can play too
 
+v2.0 - drops state-saving, adds resonant equalizer
 
 
 requires norns, grid optional
