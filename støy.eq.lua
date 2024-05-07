@@ -2,30 +2,28 @@
 --
 --
 --  'støy' is noise
--- 
+--
 --
 --
 -- ...
--- v1.1 / imminentgloom 
+-- v2.0 / imminent gloom 
 --
 -- e1 hz
 -- e2 choose
 -- e3 affect
 --
--- k1+e1 hz, fine
+-- k1+e1 res eq dry/wet
+-- k1+row decay time 
+--
 -- k1+e2 delay rate
 -- k1+e3 feedback
 -- k2 delay send
--- k3 mute
+-- k3 mute, pre delay/eq
 --
--- 16 snapshots 
--- k1+row1 save
--- k1+row2-8 load
-
 
 -- load engine
 
-engine.name = 'ulyd' -- u- is the prefix of displeasure, lyd is sound
+engine.name = 'ulydreseq' -- u- is the prefix of displeasure, lyd is sound, reseq because it adds a resonant equalizer
 
 
 -- connect to grid
@@ -39,7 +37,7 @@ function init()
 	
 	-- do we persist?
 	
-	persistence = false  -- start with default sound when false, start where you left off if true
+	persistence = true  -- start with default sound when false, start where you left off if true
 	
 	
 	-- first screen, first word 
@@ -81,7 +79,7 @@ function init()
 	engine.am(0.01)
 	engine.gain(0.5)
 	engine.level(1)
-	
+	engine.blend(-1)
 	
 	-- set up delay in softcut
 	
@@ -95,7 +93,7 @@ function init()
 	softcut.pan(1, 0.0)
 	
 	softcut.play(1, 1)
-	softcut.rate(1, 1)
+	softcut.rate(1, 10)
 	softcut.rate_slew_time(1, 0.25)
 	softcut.loop_start(1, 1)
 	softcut.loop_end(1, 1.5)
@@ -103,21 +101,23 @@ function init()
 	softcut.fade_time(1, 0.1)
 	softcut.rec(1, 1)
 	softcut.rec_level(1, 1)
-	softcut.pre_level(1, 0.75)
+	softcut.pre_level(1, 0.85)
 	softcut.position(1, 1)
 	softcut.enable(1, 1)
 	
 	softcut.filter_dry(1, 0.125)
-	softcut.filter_fc(1, 1200)
+	softcut.filter_fc(1, 900)
 	softcut.filter_lp(1, 0.0)
 	softcut.filter_bp(1, 1.0)
-	softcut.filter_rq(1, 2.0)
+	softcut.filter_rq(1, 16.0)
 
 
 	-- define parameters for synth and delay
 	-- note: 'id', 'name', controlspec.new(min, max, warp, step, default, units, quantum, warp) 
 	
-	params:add_separator('synth')
+	params:add_separator('støy')
+	
+	params:add_group('sound', 10)
 	
 	params:add_control('hz', 'hz', controlspec.FREQ)
 	params:set_action('hz', function(x) engine.hz(x) end)
@@ -125,10 +125,10 @@ function init()
 	params:add_control('hard', 'hard', controlspec.new(0.5, 24, 'exp', 0, 1.5, ''))
 	params:set_action('hard', function(x) engine.hard(x) end)
 	
-	params:add_control('soft', 'soft', controlspec.new(0.001, 0.5, 'exp', 0.01, 0.001, ''))
-	params:set_action('soft', function(x) engine.soft(x) end)
+	params:add_control('soft', 'soft', controlspec.new(0.001, 0.251, 'exp', 0, 0.0, ''))
+	params:set_action('soft', function(x) engine.soft(x - 0.001) end)
 	
-	params:add_control('drift', 'drift', controlspec.new(1, 4, 'lin', 0.01, 1.4, ''))
+	params:add_control('drift', 'drift', controlspec.new(1, 4, 'lin', 0, 1.4, ''))
 	params:set_action('drift', function(x) engine.drift(x) end)
 	
 	params:add_control('cut', 'cut', controlspec.FREQ)
@@ -140,40 +140,126 @@ function init()
 	params:add_control('fm', 'fm', controlspec.new(0, 1, 'lin', 0, 0.1, ''))
 	params:set_action('fm', function(x) engine.fm(x) end)
 	
-	params:add_control('am', 'am', controlspec.new(0, 0.5, 'db', 0, 0.010, ''))
-	params:set_action('am', function(x) engine.am(x) end)
+	params:add_control('am', 'am', controlspec.new(0.001, 1, 'exp', 0, 0.1, ''))
+	params:set_action('am', function(x) engine.am(x - 0.001) end)
 	
-	params:add_control('gain', 'gain', controlspec.new(0, 1, 'lin', 0.01, 0.5, ''))
+	params:add_control('gain', 'gain', controlspec.new(0, 1, 'lin', 0, 0.5, ''))
 	params:set_action('gain', function(x) engine.gain(x) end)
 	
-	params:add_control('level', 'level', controlspec.new(0, 1, 'lin', 1, 1, ''))
+	params:add_control('level', 'level', controlspec.new(0, 1, 'lin', 0, 1, ''))
 	params:set_action('level', function(x) engine.level(x) end)
-
-	params:add_separator('delay')
 	
-	params:add_control('delay_level', 'delay level', controlspec.new(0, 1, 'lin', 0, 0.5, ''))
-	params:set_action('delay_level', function(x) softcut.level(1, x) end)
+	params:add_group('delay', 4)
 	
-	params:add_control('delay_rate', 'delay rate', controlspec.new(0.1, 20, 'exp', 0, 0.1, ''))
-	params:set_action('delay_rate', function(x) softcut.rate(1, x) end)
-	
-	params:add_control('delay_feedback', 'delay feedback', controlspec.new(0, 1.0, 'lin', 0, 0.75, ''))
-	params:set_action('delay_feedback', function(x) softcut.pre_level(1, x) end)
-
-	params:add_control('delay_send', 'delay send', controlspec.new(0, 1, 'lin', 0, 0, ''))
+	params:add_control('delay_send', 'send', controlspec.new(0, 1, 'lin', 0, 0, ''))
 	params:set_action('delay_send', function(x) audio.level_eng_cut(x) end)
 	
+	params:add_control('delay_level', 'level', controlspec.new(0, 1, 'lin', 0, 1.0, ''))
+	params:set_action('delay_level', function(x) softcut.level(1, x) end)
+	
+	params:add_control('delay_rate', 'rate', controlspec.new(0.1, 20, 'exp', 0, 10, ''))
+	params:set_action('delay_rate', function(x) softcut.rate(1, x) end)
+	
+	params:add_control('delay_feedback', 'feedback', controlspec.new(0, 1.0, 'lin', 0, 0.85, ''))
+	params:set_action('delay_feedback', function(x) softcut.pre_level(1, x) end)
+	
+	params:add_group('støy: resonant equalizer', 9)
+
+	params:add_control('blend', 'dry/wet', controlspec.new(-1, 1, 'lin', 0.01, -1.0, ''))
+	params:set_action('blend', function(x) engine.blend(x) end)
+
+	params:add_control('29', 'ring: 29 hz', controlspec.new(0.01, 5, 'lin', 0.01, .05))
+	params:set_action('29', function(x) engine.ring1(x) end)
+	
+	params:add_control('61', 'ring: 61 hz', controlspec.new(0.01, 5, 'lin', 0.01, .05))
+	params:set_action('61', function(x) engine.ring2(x) end)
+	
+	params:add_control('115', 'ring: 115 hz', controlspec.new(0.01, 5, 'lin', 0.01, .05))
+	params:set_action('115', function(x) engine.ring3(x) end)
+	
+	params:add_control('218', 'ring: 218 hz', controlspec.new(0.01, 5, 'lin', 0.01, .05))
+	params:set_action('218', function(x) engine.ring4(x) end)
+	
+	params:add_control('411', 'ring: 411 hz', controlspec.new(0.01, 5, 'lin', 0.01, .05))
+	params:set_action('411', function(x) engine.ring5(x) end)
+	
+	params:add_control('777', 'ring: 777 hz', controlspec.new(0.01, 5, 'lin', 0.01, .05))
+	params:set_action('777', function(x) engine.ring6(x) end)
+	
+	params:add_control('1.5k', 'ring: 1500 hz', controlspec.new(0.01, 5, 'lin', 0.01, .05))
+	params:set_action('1.5k', function(x) engine.ring7(x) end)
+	
+	params:add_control('2.8k', 'ring: 2800 hz', controlspec.new(0.01, 5, 'lin', 0.01, .05))
+	params:set_action('2.8k', function(x) engine.ring8(x) end)
+
+	params:add_group('freq', 8)
+	params:hide('freq') -- comment this away to edit band frequency from params menu
+
+	params:add_control('freq1', 'freq1', controlspec.new(20, 10000, 'lin', .1, 29, 'hz'))
+	params:set_action('freq1', function(x) engine.freq1(x) end)
+	
+	params:add_control('freq2', 'freq2', controlspec.new(20, 10000, 'lin', .1, 61, 'hz'))
+	params:set_action('freq2', function(x) engine.freq2(x) end)
+	
+	params:add_control('freq3', 'freq3', controlspec.new(20, 10000, 'lin', .1, 115, 'hz'))
+	params:set_action('freq3', function(x) engine.freq3(x) end)
+	
+	params:add_control('freq4', 'freq4', controlspec.new(20, 10000, 'lin', .1, 218, 'hz'))
+	params:set_action('freq4', function(x) engine.freq4(x) end)
+	
+	params:add_control('freq5', 'freq5', controlspec.new(20, 10000, 'lin', .1, 411, 'hz'))
+	params:set_action('freq5', function(x) engine.freq5(x) end)
+	
+	params:add_control('freq6', 'freq6', controlspec.new(20, 10000, 'lin', .1, 777, 'hz'))
+	params:set_action('freq6', function(x) engine.freq6(x) end)
+	
+	params:add_control('freq7', 'freq7', controlspec.new(20, 10000, 'lin', .1, 1500, 'hz'))
+	params:set_action('freq7', function(x) engine.freq7(x) end)
+	
+	params:add_control('freq8', 'freq8', controlspec.new(20, 10000, 'lin', .1, 2800, 'hz'))
+	params:set_action('freq8', function(x) engine.freq8(x) end)
+
+	params:add_group('amp', 8)
+	params:hide('amp') -- comment this away to edit band amplitude from params menu
+	
+	params:add_control('amp1', 'amp1', controlspec.new(0, 1, "lin", 0.01, .15))
+	params:set_action('amp1', function(x) engine.amp1(x) end)
+	
+	params:add_control('amp2', 'amp2', controlspec.new(0, 1, "lin", 0.01, .15))
+	params:set_action('amp2', function(x) engine.amp2(x) end)
+	
+	params:add_control('amp3', 'amp3', controlspec.new(0, 1, "lin", 0.01, .15))
+	params:set_action('amp3', function(x) engine.amp3(x) end)
+	
+	params:add_control('amp4', 'amp4', controlspec.new(0, 1, "lin", 0.01, .15))
+	params:set_action('amp4', function(x) engine.amp4(x) end)
+	
+	params:add_control('amp5', 'amp5', controlspec.new(0, 1, "lin", 0.01, .15))
+	params:set_action('amp5', function(x) engine.amp5(x) end)
+	
+	params:add_control('amp6', 'amp6', controlspec.new(0, 1, "lin", 0.01, .15))
+	params:set_action('amp6', function(x) engine.amp6(x) end)
+	
+	params:add_control('amp7', 'amp7', controlspec.new(0, 1, "lin", 0.01, .15))
+	params:set_action('amp7', function(x) engine.amp7(x) end)
+	
+	params:add_control('amp8', 'amp8', controlspec.new(0, 1, "lin", 0.01, .15))
+	params:set_action('amp8', function(x) engine.amp8(x) end)
+	
+	params:bang()
 	
 	-- make a list of params to use with interface
 	
 	p_list = {'hard', 'soft', 'drift', 'cut', 'res', 'fm', 'am', 'gain'}
+	-- f_list = {'29', '61', '115', '218', '411', '777', '1.5k', '2.8k'} -- low on top
+	f_list = {'2.8k', '1.5k', '777', '411', '218', '115', '61', '29'} -- low on bottom
 	
 	p_pos_zero = 0					-- steps through numbers, starting at zero 
 	p_pos = 1						-- examines a word from the list
 	
-	p_val = params:get_raw('hard')
-	g_val = params:get_raw('hard')
-
+	p_val = params:get_raw('hard')	-- the value we draw on screen
+	g_val = params:get_raw('hard')	-- the value we draw on the grid
+	-- there is also a f_val, but it does not need to initialize, it shows the state of the eq
 
 	-- load last parms if we choose to persist
   
@@ -240,11 +326,13 @@ end
 -- display its value rounded to nearest 16th
 
 function row_current(row)
-	for n = 1, 16 do
-		g:led(n, row, g_background)
-	end
-	for n = 1, math.floor(g_val * 16, 1) do
-		g:led(n, row, g_current)
+	if k1_held == false then	
+		for n = 1, 16 do
+			g:led(n, row, g_background)
+		end
+		for n = 1, math.floor(g_val * 16, 1) do
+			g:led(n, row, g_current)
+		end
 	end
 end
 
@@ -252,9 +340,17 @@ end
 -- dimly light up all rows with values rounded to nearest 16th (no background)
 
 function row_all()
-	for row = 1, 8 do
-		for n = 1, math.floor(params:get_raw(p_list[row]) * 16, 1) do
-			g:led(n, row, g_params)
+	if k1_held == false then
+		for row = 1, 8 do
+			for n = 1, math.floor(params:get_raw(p_list[row]) * 16, 1) do
+				g:led(n, row, g_params)
+			end
+		end
+	elseif k1_held == true then
+		for row = 1, 8 do
+			for n = 1, math.floor(params:get_raw(f_list[row]) * 16, 1) do
+				g:led(n, row, g_current)
+			end
 		end
 	end
 end
@@ -390,9 +486,9 @@ function enc(n, d)
 		remember = word
 		p_val = params:get_raw('hz')
 	elseif n == 1 and k1_held == true then
-		params:delta('hz', d * 0.1)
-		word = 'hz.0'
-		p_val = params:get_raw('hz')
+		params:delta('blend', d)
+		word = 'ping'
+		p_val = params:get_raw('blend')
 	end
 
 
@@ -445,12 +541,12 @@ g.key = function(x, y, z)
 			if x / 16 == 0.0625 then g_val = 0 else g_val = x / 16 end		-- x possition sets the value, plays better if first button is 0
 			params:set_raw(word, g_val)
 			p_val = params:get_raw(word)
-		elseif k1_held == true and y == 1 then                       		-- k1 + any button from row 1: save a snapshot
-      		params:write('/home/we/dust/data/støy/snapshot_'.. x ..'.pset')
-      		word = x .. '.'
-    	elseif k1_held == true and y ~= 1 then                       		-- k1 + any button form any other row: load a snapshot
-      		params:read('/home/we/dust/data/støy/snapshot_'.. x ..'.pset')
-	    	word = x .. '!'
+		elseif k1_held == true then
+			f_pos = y
+			word = f_list[f_pos]
+			if x / 16 == 0.0625 then f_val = 0.01 else f_val = x / 16 end	-- x possition sets the value, plays better if first button is 0
+			params:set_raw(word, f_val)
+			p_val = params:get_raw(word)
 	  	end
   end
 
