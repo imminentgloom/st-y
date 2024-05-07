@@ -163,7 +163,7 @@ function init()
 	params:add_control('delay_feedback', 'feedback', controlspec.new(0, 1.0, 'lin', 0, 0.85, ''))
 	params:set_action('delay_feedback', function(x) softcut.pre_level(1, x) end)
 	
-	params:add_group('støy: resonant equalizer', 9)
+	params:add_group('resonant equalizer', 9)
 
 	params:add_control('blend', 'dry/wet', controlspec.new(-1, 1, 'lin', 0.01, -1.0, ''))
 	params:set_action('blend', function(x) engine.blend(x) end)
