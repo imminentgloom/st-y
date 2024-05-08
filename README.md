@@ -8,31 +8,30 @@ skittering, scratching, sputtering sounds from a trio of oscillators that respec
 
 i made this to see if i could play the same kind of music on norns as i have done for years on my modular, they both feel similar, familiar, but also different.
 
-if you want you can play too
-  
-  
-  
-requires norns, grid optional
-  
-  
-  
-e1 pitch  
-e2 chooses  
-e3 affects  
+if you want you can play too  
+<br>
+<br>
+v2.0 - drops state-saving, adds resonant equalizer
+<br>  
+<br>
+requires norns, grid recomended
 
-k1+e1 pitch, fine  
+
+
+e1 pitch
+e2 chooses
+e3 affects
+
+k1+e1 res eq dry/wet  
+k1+row decay time  
+
 k1+e2 delay rate  
 k1+e3 delay feedback  
 
 k2 momentary delay send  
 k3 momentary mute  
 
-16 snapshots  
-k1+row1 save  
-k2+row2-8 load  
-  
-set persistence = true on line 41 to start where you left off, defaults to false/default sound
-
 
 
 install from maiden or download to ‘dust/code’, then restart norns
+
