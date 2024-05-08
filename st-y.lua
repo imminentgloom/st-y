@@ -218,6 +218,8 @@ end
 function scribe()
 	screen.level(1)
 	screen.move(3, 48)
+	screen.font_face(11)
+	screen.font_size(60)
 	screen.text(word)
 end
 
