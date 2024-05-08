@@ -14,7 +14,7 @@ if you want you can play too
 v2.0 - drops state-saving, adds resonant equalizer
 <br>  
 <br>
-requires norns, grid optional
+requires norns, grid recomended
 
 
 
@@ -24,6 +24,7 @@ e3 affects
 
 k1+e1 res eq dry/wet  
 k1+row decay time  
+
 k1+e2 delay rate  
 k1+e3 delay feedback  
 
