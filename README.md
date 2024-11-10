@@ -19,6 +19,7 @@ requires norns, grid recomended
 
 K1: shift  
 K2: delay send  
+K2 + shift: latch delay send  
 K3: mute (before eq/del)  
  
 E1: hz  
