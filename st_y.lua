@@ -10,6 +10,7 @@
 --
 -- K1: shift
 -- K2: delay send
+-- K2 + shift: latch delay send
 -- K3: mute (before eq/del)
 -- 
 -- E1: hz
@@ -265,24 +266,32 @@ function key(n,z)
 
    if n == 2 and z == 1 then
       k2_held = true
-      params:set("delay_send", 1.0)
+      if not k1_held then
+			params:set("delay_send", 1)
+		end
+		if k1_held then
+			local val = (params:get("delay_send") + 1) % 2
+			params:set("delay_send", val)
+		end			
       word = "del"
       p_val = 0
    elseif n == 2 and z == 0 then
       k2_held = false
-      params:set("delay_send", 0.0)
+      if not k1_held then
+			params:set("delay_send", 0)
+		end
       word = prev_word
       p_val = params:get_raw(word)
    end	
 
    if n == 3 and z == 1 then
       k3_held = true
-      params:set("level", 0,0)
+      params:set("level", 0)
       word = "null"
       p_val = 0
    elseif n == 3 and z == 0 then
       k3_held = false
-      params:set("level", 1.0)
+      params:set("level", 1)
       word = prev_word
       p_val = params:get_raw(word)
    end
