@@ -11,27 +11,25 @@ i made this to see if i could play the same kind of music on norns as i have don
 if you want you can play too  
 <br>
 <br>
+v3.0 - smoother param-changes, better grid interaction  
 v2.0 - drops state-saving, adds resonant equalizer
 <br>  
 <br>
 requires norns, grid recomended
 
-
-
-e1 pitch
-e2 chooses
-e3 affects
-
-k1+e1 res eq dry/wet  
-k1+row decay time  
-
-k1+e2 delay rate  
-k1+e3 delay feedback  
-
-k2 momentary delay send  
-k3 momentary mute  
-
-
-
+K1: shift  
+K2: delay send  
+K3: mute (before eq/del)  
+ 
+E1: hz  
+E2: choose (also grid y)  
+E3: affect (also grid x)  
+  
+E1 + shift: EQ dry/wet  
+E2 + shift: delay rate  
+E3 + shift: feedback  
+  
+grid + shift: EQ band decay  
+  
 install from maiden or download to ‘dust/code’, then restart norns
 
