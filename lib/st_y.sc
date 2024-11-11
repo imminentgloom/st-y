@@ -1,52 +1,54 @@
 
-// CroneEngine_ulydreseq
+// CroneEngine_støy
 // three oscillators: one is filtered, a second modulates the filter, a third modulates the gain
 // three oscillators: mix and modulate themselves creating harder edges, shallower angles are softer
 // a resonant eq at the end
 
-// Inherit methods from CroneEngine
 Engine_st_y : CroneEngine {
 	var <synth;
+	var params;
 
 	*new { arg context, doneCallback;
 		^super.new(context, doneCallback);
 	}
+
 	alloc {
+		SynthDef(\st_y, {
+			arg	out, hz, hard, soft, drift, cut, res, fm, gain, am, level, blend,
+					freq1, freq2, freq3, freq4, freq5, freq6, freq7, freq8,
+					amp1, amp2, amp3, amp4, amp5, amp6, amp7, amp8,
+					ring1, ring2, ring3, ring4, ring5, ring6, ring7, ring8;
 
-		synth = {
-
-			arg	out, hz, hard, soft, drift, cut, res, fm, gain, am, level, blend, freq1, freq2, freq3, freq4, freq5, freq6, freq7, freq8, amp1 = 0.15, amp2 = 0.15, amp3 = 0.15, amp4 = 0.15, amp5 = 0.15, amp6 = 0.15, amp7 = 0.15, amp8 = 0.15, ring1 = 0.05, ring2 = 0.05, ring3 = 0.05, ring4 = 0.05, ring5 = 0.05, ring6 = 0.05, ring7 = 0.05, ring8 = 0.05;
-
-			var fb, osc1, osc2, osc3, mix, filter, vca, reseq, fade, freqs, amps, rings;
-
-			freqs = [freq1, freq2, freq3, freq4, freq5, freq6 , freq7, freq8];
-			amps = [amp1, amp2, amp3, amp4, amp5, amp6, amp7, amp8];
-			rings = [ring1, ring2, ring3, ring4, ring5, ring6, ring7, ring8];
-
-			//fb = LeakDC.ar(Clip.ar(LocalIn.ar(1), -1, 1)) * hard;
+			var	fb,
+					osc1, osc2, osc3, mix,
+					cutoff, filter, dry,
+					freqs, amps, rings, wet, fade;
 
 			fb = Sanitize.ar(LeakDC.ar(Clip.ar(LocalIn.ar(1), -1, 1))) * hard;
 
 			osc1 = VarSaw.ar(freq: (fb * hz + hz), width: soft);
 			osc2 = VarSaw.ar(freq: (fb * hz + hz) * (drift * 2), width: soft);
 			osc3 = VarSaw.ar(freq: (fb * hz + hz) * (drift * 3), width: soft);
-
 			mix = Mix.ar([osc1, osc2, osc3]);
 			LocalOut.ar(mix);
 
 			filter = MoogFF.ar(in: osc1, freq: fm * (osc2 * cut) + cut, gain: res);
+			dry = ((filter * gain) + (am * osc3)).tanh * level;
 
-			vca = ((filter * gain) + (am * osc3)).tanh * level;
+			freqs = [freq1, freq2, freq3, freq4, freq5, freq6, freq7, freq8];
+			amps = [amp1, amp2, amp3, amp4, amp5, amp6, amp7, amp8];
+			rings = [ring1, ring2, ring3, ring4, ring5, ring6, ring7, ring8];
+			wet = DynKlank.ar(`[freqs, amps, rings], dry);
 
-			reseq = DynKlank.ar(`[freqs, amps, rings], vca);
+			fade = XFade2.ar(dry * 0.25, wet * 0.0125, pan: blend);
+			Out.ar(out, Pan2.ar(fade)).tanh;
+		}).add;
 
-			fade = XFade2.ar(vca * 0.25, reseq * 0.0125, pan: blend);
+		context.server.sync;
 
-			Out.ar(out, Pan2.ar(fade)).tanh * 0.1;
+		synth = Synth.new(\st_y, [context.out_b], context.xg);
 
-		}.play(args: [\out, context.out_b], target: context.xg);
-
-// Commands
+		// Commands
 
 		this.addCommand("hz", "f", { arg msg;
 			synth.set(\hz, msg[1]);
@@ -187,10 +189,8 @@ Engine_st_y : CroneEngine {
 		this.addCommand("ring8", "f", { arg msg;
 			synth.set(\ring8, msg[1]);
 		});
-
 	}
 
-	// define a function that is called when the synth is shut down
 	free {
 		synth.free;
 	}
