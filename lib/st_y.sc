@@ -6,7 +6,6 @@
 
 Engine_st_y : CroneEngine {
 	var <synth;
-	var params;
 
 	*new { arg context, doneCallback;
 		^super.new(context, doneCallback);
