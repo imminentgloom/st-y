@@ -104,7 +104,7 @@ g.key = function(x, y, z)
          if y_buff[y][1] == 1 then
             g_val = 0
          else
-            g_val = y_buff[y][1] / 15
+            g_val = y_buff[y][1] / 16
          end
       end
       
@@ -115,7 +115,7 @@ g.key = function(x, y, z)
          if y_buff[y][#y_buff[y]] == 1 then
             g_val = 0
          else
-            g_val = y_buff[y][#y_buff[y]] / 15
+            g_val = y_buff[y][#y_buff[y]] / 16
          end
       end
       
@@ -131,7 +131,7 @@ g.key = function(x, y, z)
          if y_buff[y][1] == 1 then
             f_val = 0.01
          else
-            f_val = y_buff[y][1] / 15
+            f_val = y_buff[y][1] / 16
          end
       end
       
@@ -141,7 +141,7 @@ g.key = function(x, y, z)
          if y_buff[y][#y_buff[y]] == 1 then
             f_val = 0.01
          else
-            f_val = y_buff[y][#y_buff[y]] / 15
+            f_val = y_buff[y][#y_buff[y]] / 16
          end
       end
 
