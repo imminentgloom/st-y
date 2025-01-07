@@ -164,21 +164,21 @@ local g_current    = 15
 -- grid: lights
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-function row_current(row) -- light up the current row, display val rounded to nearest 16th
+function row_current(row) -- light up the current row, display val rounded to nearest grid column
    if not k1_held then	
-      for n = 1, 16 do
+      for n = 1, g.cols do
          g:led(n, row, g_current_bg)
       end
-      for n = 1, math.floor(g_val * 16, 1) do
+      for n = 1, math.floor(g_val * g.cols, 1) do
          g:led(n, row, g_current)
       end
    end
 end
 
-function row_all() -- light up all rows with val rounded to nearest 16th
+function row_all() -- light up all rows with val rounded to nearest grid column
    if not k1_held then
       for row = 1, 8 do
-         for n = 1, math.floor(params:get_raw(p_list[row]) * 16, 1) do
+         for n = 1, math.floor(params:get_raw(p_list[row]) * g.cols, 1) do
             g:led(n, row, g_params)
          end
       end
@@ -186,7 +186,7 @@ function row_all() -- light up all rows with val rounded to nearest 16th
 
    if k1_held then
       for row = 1, 8 do
-         for n = 1, math.floor(params:get_raw(f_list[row]) * 16, 1) do
+         for n = 1, math.floor(params:get_raw(f_list[row]) * g.cols, 1) do
             g:led(n, row, g_current)
          end
       end
@@ -196,7 +196,8 @@ end
 function scanlines_grid() -- draw noisy lines across the grid
    for row = 1, 8 do
       active = math.random(0, 1) * g_scanlines
-      for n = 1, 16 do
+      -- for n = 1, 16 do
+      for n = 1, g.cols do
          g:led(n, row, active)
       end
    end
