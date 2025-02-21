@@ -30,9 +30,8 @@ engine.name = "st_y"
 
 g = grid.connect()
 
-include("lib/params")
-include("lib/delay")
-
+    delay = include("lib/delay")
+     prms = include("lib/params")
 MusicUtil = require("musicutil")
 
 local save_on_exit = true
@@ -48,8 +47,8 @@ local p_list = {"hard", "soft", "drift", "cut", "res", "fm", "am", "gain"}
 local f_list = {"2.8k", "1.5k", "777", "411", "218", "115", "61", "29"}
 local p_pos = 1
 
-local p_val
-local g_val
+local p_val = 0
+local g_val = 0
 
 local y_buff = {{},{},{},{},{},{},{},{},}
 
@@ -58,11 +57,11 @@ local y_buff = {{},{},{},{},{},{},{},{},}
 
 function init()
 
-   delay_init()
-   params_init()
+   delay:init()
+   prms:init()
 
    if save_on_exit then
-      params:read(norns.state.data .. "/state.pset")
+      params:read(norns.state.data .. "state.pset")
       params:bang()
    end
    
@@ -104,7 +103,7 @@ g.key = function(x, y, z)
          if y_buff[y][1] == 1 then
             g_val = 0
          else
-            g_val = y_buff[y][1] / g.cols
+            g_val = y_buff[y][1] / 16
          end
       end
       
@@ -115,7 +114,7 @@ g.key = function(x, y, z)
          if y_buff[y][#y_buff[y]] == 1 then
             g_val = 0
          else
-            g_val = y_buff[y][#y_buff[y]] / g.cols
+            g_val = y_buff[y][#y_buff[y]] / 16
          end
       end
       
@@ -131,7 +130,7 @@ g.key = function(x, y, z)
          if y_buff[y][1] == 1 then
             f_val = 0.01
          else
-            f_val = y_buff[y][1] / g.cols
+            f_val = y_buff[y][1] / 16
          end
       end
       
@@ -141,7 +140,7 @@ g.key = function(x, y, z)
          if y_buff[y][#y_buff[y]] == 1 then
             f_val = 0.01
          else
-            f_val = y_buff[y][#y_buff[y]] / g.cols
+            f_val = y_buff[y][#y_buff[y]] / 16
          end
       end
 
@@ -149,8 +148,8 @@ g.key = function(x, y, z)
       p_val = params:get_raw(word)
    end
   
-  redraw()
-  redraw_grid()
+   redraw()
+   redraw_grid()
 end
 
 -- grid: "color" palette
@@ -164,21 +163,21 @@ local g_current    = 15
 -- grid: lights
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-function row_current(row) -- light up the current row, display val rounded to nearest grid column
+function row_current(row) -- light up the current row, display val rounded to nearest 16th
    if not k1_held then	
-      for n = 1, g.cols do
+      for n = 1, 16 do
          g:led(n, row, g_current_bg)
       end
-      for n = 1, math.floor(g_val * g.cols, 1) do
+      for n = 1, math.floor(g_val * 16, 1) do
          g:led(n, row, g_current)
       end
    end
 end
 
-function row_all() -- light up all rows with val rounded to nearest grid column
+function row_all() -- light up all rows with val rounded to nearest 16th
    if not k1_held then
       for row = 1, 8 do
-         for n = 1, math.floor(params:get_raw(p_list[row]) * g.cols, 1) do
+         for n = 1, math.floor(params:get_raw(p_list[row]) * 16, 1) do
             g:led(n, row, g_params)
          end
       end
@@ -186,7 +185,7 @@ function row_all() -- light up all rows with val rounded to nearest grid column
 
    if k1_held then
       for row = 1, 8 do
-         for n = 1, math.floor(params:get_raw(f_list[row]) * g.cols, 1) do
+         for n = 1, math.floor(params:get_raw(f_list[row]) * 16, 1) do
             g:led(n, row, g_current)
          end
       end
@@ -196,8 +195,7 @@ end
 function scanlines_grid() -- draw noisy lines across the grid
    for row = 1, 8 do
       active = math.random(0, 1) * g_scanlines
-      -- for n = 1, 16 do
-      for n = 1, g.cols do
+      for n = 1, 16 do
          g:led(n, row, active)
       end
    end
@@ -268,19 +266,19 @@ function key(n,z)
    if n == 2 and z == 1 then
       k2_held = true
       if not k1_held then
-			params:set("delay_send", 1)
-		end
-		if k1_held then
-			local val = (params:get("delay_send") + 1) % 2
-			params:set("delay_send", val)
-		end			
+         params:set("delay_send", 1)
+      end
+      if k1_held then
+         local val = (params:get("delay_send") + 1) % 2
+         params:set("delay_send", val)
+      end			
       word = "del"
       p_val = 0
    elseif n == 2 and z == 0 then
       k2_held = false
       if not k1_held then
-			params:set("delay_send", 0)
-		end
+         params:set("delay_send", 0)
+      end
       word = prev_word
       p_val = params:get_raw(word)
    end	
@@ -354,6 +352,6 @@ end
 
 function cleanup()
    if save_on_exit then
-      params:write(norns.state.data .. "/state.pset")
+      params:write(norns.state.data .. "state.pset")
    end
 end
