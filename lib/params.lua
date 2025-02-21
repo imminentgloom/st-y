@@ -1,8 +1,13 @@
 prms = {}
 
-function prms:changed()
-   redraw()
-   redraw_grid()
+function prms:changed() -- update interface when param changes
+   if prms_timer ~= nil then
+      redraw()
+      redraw_grid()
+      prms_timer = clock.run(function() clock.sleep(1/60) end)
+   else
+      -- print("Q full")
+   end
 end
 
 function prms:init()
