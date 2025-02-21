@@ -62,9 +62,10 @@ function init()
 
    if save_on_exit then
       params:read(norns.state.data .. "state.pset")
-      params:bang()
    end
-   
+
+   params:bang()
+
    p_val = params:get_raw("hard")
    g_val = p_val
    
