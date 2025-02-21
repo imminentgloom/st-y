@@ -50,7 +50,7 @@ local p_pos = 1
 local p_val = 0
 local g_val = 0
 
-local y_buff = {{},{},{},{},{},{},{},{},}
+local y_buff = {{},{},{},{},{},{},{},{}}
 
 -- init
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -104,7 +104,7 @@ g.key = function(x, y, z)
          if y_buff[y][1] == 1 then
             g_val = 0
          else
-            g_val = y_buff[y][1] / 16
+            g_val = y_buff[y][1] / g.cols
          end
       end
       
@@ -115,7 +115,7 @@ g.key = function(x, y, z)
          if y_buff[y][#y_buff[y]] == 1 then
             g_val = 0
          else
-            g_val = y_buff[y][#y_buff[y]] / 16
+            g_val = y_buff[y][#y_buff[y]] / g.cols
          end
       end
       
@@ -131,7 +131,7 @@ g.key = function(x, y, z)
          if y_buff[y][1] == 1 then
             f_val = 0.01
          else
-            f_val = y_buff[y][1] / 16
+            f_val = y_buff[y][1] / g.cols
          end
       end
       
@@ -141,7 +141,7 @@ g.key = function(x, y, z)
          if y_buff[y][#y_buff[y]] == 1 then
             f_val = 0.01
          else
-            f_val = y_buff[y][#y_buff[y]] / 16
+            f_val = y_buff[y][#y_buff[y]] / g.cols
          end
       end
 
@@ -166,10 +166,10 @@ local g_current    = 15
 
 function row_current(row) -- light up the current row, display val rounded to nearest 16th
    if not k1_held then	
-      for n = 1, 16 do
+      for n = 1, g.cols do
          g:led(n, row, g_current_bg)
       end
-      for n = 1, math.floor(g_val * 16, 1) do
+      for n = 1, math.floor(g_val * g.cols, 1) do
          g:led(n, row, g_current)
       end
    end
@@ -178,7 +178,7 @@ end
 function row_all() -- light up all rows with val rounded to nearest 16th
    if not k1_held then
       for row = 1, 8 do
-         for n = 1, math.floor(params:get_raw(p_list[row]) * 16, 1) do
+         for n = 1, math.floor(params:get_raw(p_list[row]) * g.cols, 1) do
             g:led(n, row, g_params)
          end
       end
@@ -186,7 +186,7 @@ function row_all() -- light up all rows with val rounded to nearest 16th
 
    if k1_held then
       for row = 1, 8 do
-         for n = 1, math.floor(params:get_raw(f_list[row]) * 16, 1) do
+         for n = 1, math.floor(params:get_raw(f_list[row]) * g.cols, 1) do
             g:led(n, row, g_current)
          end
       end
@@ -196,7 +196,7 @@ end
 function scanlines_grid() -- draw noisy lines across the grid
    for row = 1, 8 do
       active = math.random(0, 1) * g_scanlines
-      for n = 1, 16 do
+      for n = 1, g.cols do
          g:led(n, row, active)
       end
    end
@@ -208,45 +208,6 @@ function redraw_grid()
    row_all()
    row_current(p_pos)
    g:refresh()
-end
-
--- norns: screen
--- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
-
-function bargraph() -- val as bargraph
-   y = math.floor(p_val * 64)
-   screen.rect(0, 64, 128, -y)
-   screen.level(1)
-   screen.fill()
-end
-
-function scanlines() -- draw noisy lines across the screen
-   for n = 0, 64 do
-      screen.level(math.random(0,1) * 15)
-      screen.move(0, n)
-      screen.line(128, n)
-      screen.stroke()
-   end
-end
-
-function scribe() -- write a word on the screen
-   screen.level(1)
-   screen.font_face(11)
-   screen.font_size(60)
-   screen.move(3, 48)
-   screen.font_face(11)
-   screen.font_size(60)
-   screen.text(word)
-end
-
-function redraw()
-   screen.aa(0)
-   screen.clear()
-   screen.blend_mode(4)
-   bargraph()
-   scanlines()
-   scribe()
-   screen.update()
 end
 
 -- norns: interaction
@@ -346,6 +307,45 @@ function enc(n, d)
 
    redraw()
    redraw_grid()
+end
+
+-- norns: screen
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+function bargraph() -- val as bargraph
+   y = math.floor(p_val * 64)
+   screen.rect(0, 64, 128, -y)
+   screen.level(1)
+   screen.fill()
+end
+
+function scanlines() -- draw noisy lines across the screen
+   for n = 0, 64 do
+      screen.level(math.random(0,1) * 15)
+      screen.move(0, n)
+      screen.line(128, n)
+      screen.stroke()
+   end
+end
+
+function scribe() -- write a word on the screen
+   screen.level(1)
+   screen.font_face(11)
+   screen.font_size(60)
+   screen.move(3, 48)
+   screen.font_face(11)
+   screen.font_size(60)
+   screen.text(word)
+end
+
+function redraw()
+   screen.aa(0)
+   screen.clear()
+   screen.blend_mode(4)
+   bargraph()
+   scanlines()
+   scribe()
+   screen.update()
 end
 
 -- tidy up before we go
