@@ -1,4 +1,6 @@
-function delay_init()
+delay = {}
+
+function delay:init()
 	audio.level_cut(1.0)
 	audio.level_adc_cut(0.0)
 	audio.level_eng_cut(0.0)
@@ -27,3 +29,5 @@ function delay_init()
 	softcut.filter_bp(1, 1.0)
 	softcut.filter_rq(1, 16.0)
 end
+
+return delay
