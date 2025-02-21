@@ -101,7 +101,8 @@ function prms:init()
       params:add_control('delay_send', 'send', controlspec.new(0, 1, 'lin', 0, 0))
       params:set_action('delay_send', 
          function(x)
-            audio.level_eng_cut(x) 
+            audio.level_eng_cut(x)
+            audio.level_adc_cut(x) 
             prms:changed()
          end
       )
