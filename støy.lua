@@ -6,7 +6,7 @@
 --
 --
 -- ...
--- v3.0 / imminent gloom 
+-- v3.1 / imminent gloom 
 --
 -- K1: shift
 -- K2: delay send
@@ -36,6 +36,8 @@ MusicUtil = require("musicutil")
 
 local save_on_exit = true
 
+local ui_dirty = true
+
 local word = "støy"
 local prev_word = "hard"
 
@@ -52,28 +54,13 @@ local g_val = 0
 
 local y_buff = {{},{},{},{},{},{},{},{}}
 
--- init
+-- arcify
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 
-function init()
+local Arcify = include("lib/arcify")
+local arcify = Arcify.new()
 
-   delay:init()
-   prms:init()
-
-   if save_on_exit then
-      params:read(norns.state.data .. "state.pset")
-   end
-
-   params:bang()
-
-   p_val = params:get_raw("hard")
-   g_val = p_val
-   
-   redraw()
-   redraw_grid()
-end
-
--- functions
+-- functions / clocks
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
 local function g_buffer(buff, val, z)
    if z == 1 then
@@ -88,6 +75,87 @@ local function g_buffer(buff, val, z)
          end
       end
    end
+end
+
+local function ui_event()
+   while true do
+      clock.sleep(1/30)
+      if ui_dirty then
+         redraw()
+         redraw_grid()
+         ui_dirty = false
+      end
+   end
+end
+
+function prms:changed()
+   if word ~= "hard" or word ~= "soft" or word ~= "drift" or word ~= "cut" or word ~= "res" or word ~= "fm" or word ~= "am" or word ~= "gain" then
+      p_val = params:get_raw(prev_word)
+   else
+      p_val = params:get_raw(word)
+   end
+   g_val = p_val
+   ui_dirty = true
+end
+
+-- init
+-- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+
+function init()
+
+   delay:init()
+   prms:init()
+
+   if save_on_exit then
+      params:read(norns.state.data .. "state.pset")
+   end
+
+   clk_ui = clock.run(ui_event)
+
+   arcify:register("level", 0.001)
+   
+   arcify:register("hz", 0.001)
+
+   arcify:register("hard", 0.001)
+   arcify:register("soft", 0.001)
+   arcify:register("cut", 0.001)
+   arcify:register("res", 0.001)
+   arcify:register("drift", 0.001)
+   arcify:register("fm", 0.001)
+   arcify:register("am", 0.001)
+   arcify:register("gain", 0.001)
+   
+   arcify:register("delay_send", 0.001)
+   arcify:register("delay_level", 0.001)
+   arcify:register("delay_rate", 0.001)
+   arcify:register("delay_feedback", 0.001)
+   
+   -- arcify:register("blend", 0.001)
+   
+   -- arcify:register("29", 0.001)
+   -- arcify:register("62", 0.001)
+   -- arcify:register("115", 0.001)
+   -- arcify:register("218", 0.001)
+   -- arcify:register("411", 0.001)
+   -- arcify:register("777", 0.001)
+   -- arcify:register("1.5k", 0.001)
+   -- arcify:register("2.8k", 0.001)
+   
+   -- arcify:register("freq1", 0.001)
+   -- arcify:register("freq2", 0.001)
+   -- arcify:register("freq3", 0.001)
+   -- arcify:register("freq4", 0.001)
+   -- arcify:register("freq5", 0.001)
+   -- arcify:register("freq6", 0.001)
+   -- arcify:register("freq7", 0.001)
+   -- arcify:register("freq8", 0.001)
+   
+   arcify:add_params()
+   
+   params:bang()
+
+   p_val = params:get_raw("hard")
+   g_val = p_val
 end
 
 -- grid: buttons
@@ -121,6 +189,7 @@ g.key = function(x, y, z)
       
       params:set_raw(word, g_val)
       p_val = params:get_raw(word)
+      g_val = p_val
 
    end
 
@@ -147,10 +216,10 @@ g.key = function(x, y, z)
 
       params:set_raw(word, f_val)
       p_val = params:get_raw(word)
+      g_val = p_val
    end
   
-   redraw()
-   redraw_grid()
+   ui_dirty = true
 end
 
 -- grid: "color" palette
@@ -261,8 +330,7 @@ function key(n,z)
       word = "dull"
    end
    
-   redraw()
-   redraw_grid()
+   ui_dirty = true
 end
 
 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
@@ -305,8 +373,7 @@ function enc(n, d)
       p_val = params:get_raw("delay_feedback")
    end
 
-   redraw()
-   redraw_grid()
+   ui_dirty = true
 end
 
 -- norns: screen
